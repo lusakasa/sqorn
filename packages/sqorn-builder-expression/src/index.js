@@ -1,4 +1,5 @@
 const createExpressionCompiler = require('./compile')
+const build = Symbol.for('sqorn-build')
 
 module.exports = ({ defaultContext, expression }) => {
   const { expressions } = expression
@@ -14,19 +15,19 @@ module.exports = ({ defaultContext, expression }) => {
 }
 
 const builderProperties = ({ compile, newContext }) => ({
-  _build: {
+  [build]: {
     value: function(inherit) {
       return compile(newContext(inherit), this.current)
     }
   },
   query: {
     get: function() {
-      return this._build()
+      return this[build]()
     }
   },
   unparameterized: {
     get: function() {
-      return this._build({ unparameterized: true }).text
+      return this[build]({ unparameterized: true }).text
     }
   }
 })

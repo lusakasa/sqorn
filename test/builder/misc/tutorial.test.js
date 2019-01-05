@@ -283,32 +283,6 @@ describe('tutorial', () => {
         args: []
       })
     })
-    describe('Select Express', () => {
-      test('Express Syntax', () => {
-        const name = 'Dalinar'
-        // a == b and b ==c --> a == c
-        const a = sq`person`
-        const b = sq('person')
-        const c = sq.from`person`
-        expect(a.query).toEqual(b.query)
-        expect(b.query).toEqual(c.query)
-
-        const d = sq`person``name = ${name}`
-        const e = sq`person`({ name })
-        const f = sq.from`person`.where`name = ${name}`
-        expect(d.query).toEqual(e.query)
-        expect(e.query).toEqual(f.query)
-
-        const g = sq`person``name = ${name}``age`
-        const h = sq.from`person`.where`name = ${name}`.return`age`
-        const i = sq
-          .from('person')
-          .where({ name })
-          .return('age')
-        expect(g.query).toEqual(h.query)
-        expect(h.query).toEqual(i.query)
-      })
-    })
     describe('Extend', () => {
       const FantasyBook = sq.from('book').where({ genre: 'fantasy' })
       const Title = sq.return('title')
@@ -329,10 +303,11 @@ describe('tutorial', () => {
       })
       query({
         name: 'middle query chain',
-        query: sq`author`.extend(
-          sq`book``book.author_id = author.id``title`,
-          sq`publisher``publisher.id = book.publisher_id``publisher`
-        )`author.id = 7``first_name`,
+        query: sq.from`author`.extend(
+          sq.from`book`.where`book.author_id = author.id`.return`title`,
+          sq.from`publisher`.where`publisher.id = book.publisher_id`
+            .return`publisher`
+        ).where`author.id = 7`.return`first_name`,
         text:
           'select title, publisher, first_name from author, book, publisher where (book.author_id = author.id) and (publisher.id = book.publisher_id) and (author.id = 7)',
         args: []
@@ -682,7 +657,7 @@ describe('tutorial', () => {
       })
       query({
         name: '.delete.delete',
-        query: sq`book`.delete.delete.delete,
+        query: sq.from`book`.delete.delete.delete,
         text: 'delete from book'
       })
     })
@@ -699,14 +674,6 @@ describe('tutorial', () => {
         name: '.return.delete',
         query: sq.delete.from`person`.return`name`,
         text: 'delete from person returning name'
-      })
-    })
-    describe('Express', () => {
-      query({
-        name: 'express.delete',
-        query: sq`person`({ job: 'student' })`name`.delete,
-        text: 'delete from person where (job = $1) returning name',
-        args: ['student']
       })
     })
     describe('Using', () => {
@@ -808,14 +775,6 @@ describe('tutorial', () => {
         args: ['Squirrels and Acorns']
       })
     })
-    describe('Express', () => {
-      query({
-        name: '.insert express',
-        query: sq`book`()`id`.insert({ title: 'Squirrels and Acorns' }),
-        text: 'insert into book(title) values ($1) returning id',
-        args: ['Squirrels and Acorns']
-      })
-    })
   })
   describe('Update', () => {
     describe('Set', () => {
@@ -873,17 +832,6 @@ describe('tutorial', () => {
         text:
           'update person set old = true where (age > 60 and old = false) returning id, age',
         args: []
-      })
-    })
-    describe('Express', () => {
-      query({
-        name: 'express.set({})',
-        query: sq`person`({ firstName: 'Rob' })`id`.set({
-          firstName: 'Robert'
-        }),
-        text:
-          'update person set first_name = $1 where (first_name = $2) returning id',
-        args: ['Robert', 'Rob']
       })
     })
     describe('From', () => {

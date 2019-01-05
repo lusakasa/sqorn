@@ -306,7 +306,7 @@ Table Expressions represent a table.
 
 **Constructor:** [e.table](operations#table)
 
-**Compatible Types:** `SQ`, `Table Expression`, `Unknown Expression`
+**Compatible Types:** TODO, `Table Expression`, `Unknown Expression`
 
 **Supported Operations:** [Comparison](operations#comparison), [Table](operations#table)
 

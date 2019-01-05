@@ -8,7 +8,7 @@
     "node": ">=8.0.0"
   },
   "main": "./src/index.js",
-  "repository": "https://github.com/sqorn/sqorn/tree/master/packages/sqorn-expression-builder",
+  "repository": "https://github.com/sqorn/sqorn/tree/master/packages/sqorn-builder-expression",
   "homepage": "https://sqorn.org",
   "publishConfig": {
     "access": "public"

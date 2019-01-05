@@ -29,7 +29,7 @@ CRUD Operations are dead simple.
 ```js
 const sq = require('@sqorn/pg')()
 
-const Person = sq`person`, Book = sq`book`
+const Person = sq.from`person`, Book = sq.from`book`
 
 // SELECT
 const children = await Person`age < ${13}`

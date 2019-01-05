@@ -194,8 +194,8 @@ sq.extend([
 
 ```js
 const books = [{ id: 1, title: '1984' }, { id: 2, title: 'Dracula' }]
-const b = books.map(book => sq.txt(book.id, book.title))
-const values = sq.extend(b).link(', ')
+const value = book => sq.txt(book.id, book.title)
+const values = sq.extend(books.map(value)).link(', ')
 
 sq.sql`insert into book(id, title)`
   .sql`values ${values}`

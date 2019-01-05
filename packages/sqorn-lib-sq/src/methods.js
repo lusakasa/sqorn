@@ -190,20 +190,6 @@ const methods = {
       ctx.type = 'update'
       ctx.set.push(args)
     }
-  },
-  express: {
-    updateContext: (ctx, args, count) => {
-      if (count.id === 0) {
-        count.id++
-        ctx.frm.push((ctx.join = { type: 'from', args, join: ', ' }))
-      } else if (count.id === 1) {
-        count.id++
-        ctx.whr.push(args)
-      } else if (count.id === 2) {
-        count.id++
-        ctx.ret.push(args)
-      } else throw Error('Invalid express call')
-    }
   }
 }
 

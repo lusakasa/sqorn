@@ -15,7 +15,7 @@ sidebar_label: Insert
 
 ## Insert
 
-`.from` specifies the table to insert into and `.insert` specifies the data to insert. [`.from`](#from-1) works it does in delete queries.
+`.from` specifies the table to insert into and `.insert` specifies the data to insert. [`.from`](#from-1) works as it does in delete queries.
 
 ```js
 sq.from`person(first_name, last_name)`
@@ -150,17 +150,6 @@ sq.from('book')
 .insert({ title: 'Squirrels and Acorns' })
 .return('id')
 .query
-
-{ text: 'insert into book(title) values ($1) returning id',
-  args: ['Squirrels and Acorns'] }
-```
-
-## Express
-
-[Express](select-queries#express) syntax works.
-
-```js
-sq('book')()('id').insert({ title: 'Squirrels and Acorns' }).query
 
 { text: 'insert into book(title) values ($1) returning id',
   args: ['Squirrels and Acorns'] }

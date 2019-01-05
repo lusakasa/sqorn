@@ -31,7 +31,7 @@ sq.from`person`.delete.query // equivalent
 `.delete` is idempotent.
 
 ```js
-sq`book`.delete.delete.delete.query
+sq.from`book`.delete.delete.delete.query
 
 { text: 'delete from book',
   args: [] }
@@ -39,7 +39,7 @@ sq`book`.delete.delete.delete.query
 
 ## From
 
-[`.from`](#from) works it does in [Select](select-queries) queries.
+[`.from`](#from) works as it does in [Select](select-queries) queries.
 
 However, be aware of certain SQL constraints Sqorn does not yet enforce.
 
@@ -79,7 +79,7 @@ sq.delete.from`person`.where`id = ${723}`.query
   args: [723] }
 ```
 
-`.where` works it does in [Select](select-queries) queries.
+`.where` works as it does in [Select](select-queries) queries.
 
 ## Returning
 
@@ -90,15 +90,4 @@ sq.delete.from`person`.return`name`.query
 
 { text: 'delete from person returning name',
   args: [] }
-```
-
-## Express
-
-[Express](select-queries#express) syntax works.
-
-```js
-sq`person`({ job: 'student' })`name`.delete.query
-
-{ text: 'delete from person where job = $1 returning name',
-  args: ['student'] }
 ```

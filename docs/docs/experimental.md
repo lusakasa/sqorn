@@ -305,7 +305,7 @@ order by c.name, b.release_date desc
 ```
 
 ```js
-  const sub = sq`articles a``a.book_id = b.id``count(*)`
+  const sub = sq.from`articles a``a.book_id = b.id``count(*)`
 
 ```
 
@@ -414,7 +414,7 @@ Then read the [tutorial](https://sqorn.org/docs/tutorial.html).
 CRUD Operations are dead simple.
 
 ```js
-const Person = sq`person`, Book = sq`book`
+const Person = sq.from`person`, Book = sq.from`book`
 
 // SELECT
 const children = await Person`age < ${13}`
@@ -466,12 +466,12 @@ select * from book
 sq.from`book`
   .return`*`
 // or
-sq`book`
+sq.from`book`
 ```
 
 `.from` specifies the table to query and `.return` specifies the selected columns. If `.return` isn't called, select queries implicitly request all columns (`*`).
 
-Using `sq` a template literal tag is shorthand for calling `.from`.
+Using `sq.from` a template literal tag is shorthand for calling `.from`.
 
 ### Where
 
@@ -484,12 +484,12 @@ sq.from`person`
   .where`first_name = ${'Kaladin'}`
   .return`age, job`
 // or
-sq`person``first_name = ${'Kaladin'}``age, job`
+sq.from`person``first_name = ${'Kaladin'}``age, job`
 ```
 
 `.where` specifies the `where` clause, which filters result rows. 
 
-All methods of `sq` escape template literal arguments, except when noted otherwise.
+All methods of `sq.from` escape template literal arguments, except when noted otherwise.
 
 
 ### Where Object
@@ -498,10 +498,10 @@ All methods of `sq` escape template literal arguments, except when noted otherwi
 sq.from`book`
   .where({ publishYear: 1984 })
 // or
-sq`book`({ publishYear: 1984 })
+sq.from`book`({ publishYear: 1984 })
 ```
 
-`.where` also accepts object arguments. By default `sq` converts method arguments of type `Object` from `CamelCase` to `snake_case`.
+`.where` also accepts object arguments. By default `sq.from` converts method arguments of type `Object` from `CamelCase` to `snake_case`.
 
 
 ### Where Compound
@@ -519,7 +519,7 @@ sq.from`book`
   .where`not (title = ${title})`
   .where`or (pages >= ${minPages} and genre = ${genre})`
 // or
-sq`book`(
+sq.from`book`(
     sq.not({ title }),
     { minPages: sq.l`pages >= ${minPages}`, genre }
   )
@@ -529,7 +529,7 @@ sq.from`book`
   .where`or`
   .where({ minPages: sq.l`pages >= ${minPages}`, genre })
 // or
-sq`book`(
+sq.from`book`(
   sq.or(
     sq.not(sq.op`=`('title', title))
     sq.and(
@@ -607,12 +607,12 @@ select * from book where year >= 1800 and year <= 1984
 ### insert
 
 ```javascript
-sq`person`
+sq.from`person`
   .insert({ firstName, lastName, age })
   .one`id`
 // insert into person (first_name, last_name, age)
 // values ('John', 'Doe', 40) returning id
-sq`person`
+sq.from`person`
   .insert`first_name, last_name`
   `upper(${firstName}), upper(${lastName})`
   .run
@@ -625,18 +625,18 @@ sq`person`
 
 ```javascript
 const people = [{ age: 13 }, { age: null, lastName: 'jo' }, { age: 23, lastName: 'smith' }]
-sq`person`
+sq.from`person`
   .insert(...people)
   .all`id`
 // insert into person (age, last_name)
 // values (13, DEFAULT), (NULL, 'jo'), (23, 'smith') returning id
-sq`person`
+sq.from`person`
   .insert`last_name`
   (people, person => sq.l`upper(${person.lastName})`)
   .run
 // insert into person (lastName)
 // values (upper(), upper('Doe'))
-sq`person`
+sq.from`person`
   .insert`first_name`
   `upper(${people[0].firstName})`
   `upper(${people[1].firstName})`
@@ -644,7 +644,7 @@ sq`person`
   .run
 // insert into person (first_name, lastName)
 // values(upper('John'), upper('Doe'))
-let insert = sq`person`.insert`first_name`
+let insert = sq.from`person`.insert`first_name`
 people.forEach(person => { insert = insert`upper(${person.firstName})` })
 insert.run
 ```
@@ -654,7 +654,7 @@ insert.run
 ```javascript
 const age = 23
 const increment = 2
-sq`person`({ age })`count(*)`
+sq.from`person`({ age })`count(*)`
   .set({ age: sq.l`age + ${increment}`, updateTime: sq.l`now()`})
 // or
 sq.from`person`
@@ -698,7 +698,7 @@ select * from author where author_id in (
 ### join
 
 ```javascript
-sq`person p join company c on p.employer_id = c.id``p.id = ${23}``c.name`
+sq.from`person p join company c on p.employer_id = c.id``p.id = ${23}``c.name`
 
 sq.inj`p.employer_id = c.id`(`person p`, `company c`))`p.id = ${23}``c.name`
 ```
@@ -739,7 +739,7 @@ select age, count(*) from person group by age
 ```
 
 ```javascript
-sq`person`()`age, count(*)`.groupBy`age`
+sq.from`person`()`age, count(*)`.groupBy`age`
 ```
 
 ### having
@@ -749,7 +749,7 @@ select age, count(*) count from person group by age having age < 18
 ```
 
 ```javascript
-sq`person`()`age, count(*) count`.groupBy`age``age < 18`
+sq.from`person`()`age, count(*) count`.groupBy`age``age < 18`
 ```
 
 ### order by
@@ -759,7 +759,7 @@ select * from person order by last_name, first_name
 ```
 
 ```javascript
-sq`person`.orderBy`last_name, first_name`
+sq.from`person`.orderBy`last_name, first_name`
 ```
 
 ### limit
@@ -769,7 +769,7 @@ select * from person order by last_name limit 10 offset 7
 ```
 
 ```javascript
-sq`person`.orderBy`last_name, first_name`.limit(10).offset(7)
+sq.from`person`.orderBy`last_name, first_name`.limit(10).offset(7)
 ```
 
 ### offset
@@ -930,28 +930,28 @@ __Returns:__
 
 ```javascript
 const firstName = 'John', lastName = 'Doe', age = 40, order = 'DESC'
-sq`person`
+sq.from`person`
 // select * from person
-sq`person`({ firstName })
+sq.from`person`({ firstName })
 // select * from person where first_name = 'John'
-sq`person``age > ${age}``first_name`
+sq.from`person``age > ${age}``first_name`
 // select first_name from person where age > 40
-sq`person``id`.insert({ firstName, lastName, age })
+sq.from`person``id`.insert({ firstName, lastName, age })
 // insert into person (first_name, last_name, age)
 // values ('John', 'Doe', 40) returning id
-sq`person``id`
+sq.from`person``id`
   .insert`first_name, last_name``upper(${firstName}), upper(${lastName})`
 // insert into person (first_name, lastName)
 // values(upper('John'), upper('Doe')) returning id
-sq`person`({ age })`id`.delete
+sq.from`person`({ age })`id`.delete
 // delete from person where age = 40 returning id
-sq`person``age < ${age}`.delete
+sq.from`person``age < ${age}`.delete
 // delete from person where age < 40
-sq`person p join company c on p.employer_id = c.id`
+sq.from`person p join company c on p.employer_id = c.id`
   `p.id = ${23}``c.name`
 // select c.name from person p join company c on p.employer_id = c.id
 // where p.id = 23
-sq.wit`children`(sq`person``age < ${18}`)`children`()`first_name`
+sq.wit`children`(sq.from`person``age < ${18}`)`children`()`first_name`
 // with children (select * from "person" where age < 18)
 // select first_name from children`
 sq.l`name = ${firstName}`
@@ -959,7 +959,7 @@ sq.l`name = ${firstName}`
 sq.ary`order by name ${order}`
 // order by name DESC -- builds unescaped SQL string
 const colors = sq.return`'red', 'yellow','blue'`
-sq`${colors} c`
+sq.from`${colors} c`
 // select * from (select 'red', 'yellow', 'blue') c
 ```
 
@@ -996,19 +996,19 @@ sq.delete`person`
   .return`id`
 
 // delete from person where age = 40 returning id
-sq`person``age < ${age}`.delete
+sq.from`person``age < ${age}`.delete
 // delete from person where age < 40
-sq`person p join company c on p.employer_id = c.id`
+sq.from`person p join company c on p.employer_id = c.id`
   `p.id = ${23}``c.name`
 // select c.name from person p join company c on p.employer_id = c.id
 // where p.id = 23
-sq`person`({ name: 'Ed' }).set({ name: 'Edward' })
+sq.from`person`({ name: 'Ed' }).set({ name: 'Edward' })
 Person({ name: 'Ed' })
 Person({ name: 'Ed' }).set({ name: 'Edward', age: sq.l`age + 1` })
 Person.insert({ name: 'Ed' })
 Person.delete({ name: 'Ed' })
 
-sq.wit`children`(sq`person``age < ${18}`)`children`()`first_name`
+sq.wit`children`(sq.from`person``age < ${18}`)`children`()`first_name`
 // with children (select * from "person" where age < 18)
 // select first_name from children`
 sq.l`name = ${firstName}`
@@ -1021,7 +1021,7 @@ sq.ary`order by name ${order}`
 
 ### How does sqorn work?
 
-When a method on the query builder `sq` is called, it pushes an object containing the method name and arguments to an array named `methods`.
+When a method on the query builder `sq.from` is called, it pushes an object containing the method name and arguments to an array named `methods`.
 
 ```javascript
 sq.from`person`.where`age > ${20} and age < ${30}`.return`name`
@@ -1074,7 +1074,7 @@ cached queries thoughts:
 
 
 
-const getSecret = ({ secret }) => sq`secret`({ secret }).prp('getSecret')
+const getSecret = ({ secret }) => sq.from`secret`({ secret }).prp('getSecret')
 
 const preparedGetSecret = ({
   const prepared = getSecret().prp('getSecret')

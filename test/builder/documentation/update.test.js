@@ -43,6 +43,12 @@ describe('set', () => {
       "update person set first_name = (select 'Bob'), last_name = (select 'Smith')",
     args: []
   })
+  query({
+    name: 'undefined',
+    query: sq.from('person').set({ firstName: undefined }),
+    text: 'update person set first_name = default',
+    args: []
+  })
 })
 
 describe('other', () => {

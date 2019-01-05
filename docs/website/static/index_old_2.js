@@ -114,7 +114,7 @@ const Block = props => (
 
 const queries = [
   {
-    sq: "sq`person`({ firstName: 'Rob' })`id`",
+    sq: "sq.from`person`({ firstName: 'Rob' })`id`",
     text: "select id from person where first_name = 'Rob'"
   }
 ]
@@ -129,7 +129,7 @@ const Features = props => (
         content: `CRUD operations are dead simple
 
 ${'```js'}
-${'const Person = sq`person`, Book = sq`book`'}
+${'const Person = sq.from`person`, Book = sq.from`book`'}
 
 // SELECT
 ${'const children = await Person`age < ${13}`'}

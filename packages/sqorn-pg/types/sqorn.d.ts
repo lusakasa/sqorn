@@ -1,4 +1,20 @@
-import { SQF } from './sq'
+import { Database } from './database'
+import { AnyBuilder, ManualBuilder, FragmentBuilder, RawBuilder } from './builders'
+import { Raw } from './methods/raw'
+import { CreateExpression } from './expressions'
+
+/**
+* Creates and returns a query builder with the given configuration
+* 
+* @example
+```js
+const pg = require('pg')
+const sqorn = require('@sqorn/pg')
+const pool = new pg.Pool()
+const sq = sqorn({ pg, pool })
+```
+*/
+export declare function sqorn(config?: Configuration): Sqorn
 
 interface Configuration {
   /**
@@ -66,14 +82,11 @@ await names.all()
   mapOutputKeys?: (key: string) => string
 }
 
-
-/**
-* Creates and returns a query builder with the given configuration
-* 
-* @example
-* const pg = require('pg')
-* const sqorn = require('@sqorn/pg')
-* const pool = new pg.Pool()
-* const sq = sqorn({ pg, pool })
-*/
-export declare function sqorn(config?: Configuration): SQF
+interface Sqorn {
+   db: Database
+   sq: AnyBuilder
+   sql: ManualBuilder['sql']
+   txt: FragmentBuilder['txt']
+   raw: Raw['raw']
+   e: CreateExpression
+}

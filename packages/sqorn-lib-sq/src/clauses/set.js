@@ -7,6 +7,6 @@ module.exports = ctx => {
 }
 
 const buildProperty = (ctx, key, value) =>
-  `${ctx.mapKey(key)} = ${ctx.build(value)}`
+  `${ctx.mapKey(key)} = ${value === undefined ? 'default' : ctx.build(value)}`
 
 const calls = mapJoin(buildCall(mapJoin(objectMapJoin(buildProperty))))

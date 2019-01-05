@@ -1,6 +1,7 @@
 const createQueryBuilder = require('@sqorn/builder-sq')
 const createExpressionBuilder = require('@sqorn/builder-expression')
 const { snakeCase, memoize } = require('@sqorn/lib-util')
+const build = Symbol.for('sqorn-build')
 
 /**
  * Creates a version of Sqorn for the given SQL dialect and database adapter.
@@ -34,14 +35,11 @@ const createSqorn = ({ dialect, adapter }) => (config = {}) => {
 
 function build(arg) {
   if (arg === undefined) throw Error('Error: undefined argument')
-  if (typeof arg === 'function') {
-    if (arg._build) {
-      const { type, text } = arg._build(this)
-      if (type === 'expression') return text
-      if (type === 'fragment') return text
-      return `(${text})`
-    }
-    return arg(this)
+  if (arg && arg[build]) {
+    const { type, text } = arg[build](this)
+    if (type === 'expression') return text
+    if (type === 'fragment') return text
+    return `(${text})`
   }
   return this.unparameterized ? this.escape(arg) : this.parameterize(arg)
 }

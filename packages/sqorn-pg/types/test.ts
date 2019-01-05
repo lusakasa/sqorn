@@ -1,5 +1,21 @@
-import { ExpressionBuilder } from './expression'
-declare let e: ExpressionBuilder['e'];
+
+import sqorn = require('..')
+
+const { sq, e, db } = sqorn()
+
+sq.from('book').join('book').on({ a: 3 })
+sq.where({ a: e`true` })
+
+const x = sq.raw('')
+const a = sq.txt(x)
+
+const a0 = e.add(sq.raw(''), 3).add(5).sub(6).eqAny([])
+
+const a01 = e.between(2, 3, 4).lt(true)
+const a02 = e.lt(3, 4).between(true)(false)
+const a03 = e.between(null)(null)(null)
+
+e(3).eqAny([4, 5, true])
 
 const a1 = e.and(true)
 const a2 = a1(true)
@@ -21,7 +37,7 @@ const e2 = e.eq(null, 2)
 const e3 = e.eq(2, null)
 const e4 = e.eq(1)
 
-const f1 = e.subtract(e.add(3, 4), 23).add(23).divide(null)
+const f1 = e.sub(e.add(3, 4), 23).add(23).div(null)
 const f2 = e.add(2, 3, 4).subtract(4, 5, 6)
 
 const g1 = e.and(true, false)(true)(false)(e.eq(2,3), null)
@@ -40,7 +56,7 @@ const j4 = e.between(2)`b`(false);
 const k1 = e.eq(98)`n`
 const k2 = e.eq`n`(98)
 
-declare let subquery: SubqueryExpression
+declare let subquery: TableExpression
 const l1 = e.exists(subquery)
 const l2 = e(subquery).exists
 const l3 = e(null)

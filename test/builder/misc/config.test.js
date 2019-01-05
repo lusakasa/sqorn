@@ -22,7 +22,7 @@ const createTestDatabase = async () => {
     first_name      text,
     last_name       text
   )`
-  await sq`person`.insert(
+  await sq.from`person`.insert(
     { firstName: 'Jo', lastName: 'Schmo' },
     { firstName: 'Bo', lastName: 'Mo' }
   )
@@ -31,46 +31,33 @@ const createTestDatabase = async () => {
 
 describe('Config', async () => {
   beforeAll(createTestDatabase)
-  describe('thenable', async () => {
-    test('default = true', async () => {
-      const sq = sqorn({ pg, pool: new pg.Pool(appConnection) })
-      try {
-        expect(await sq`person`({ firstName: 'Jo' })`last_name`).toEqual([
-          { lastName: 'Schmo' }
-        ])
-      } finally {
-        await sq.end()
-      }
+  test('true', async () => {
+    const sq = sqorn({
+      pg,
+      pool: new pg.Pool(appConnection)
     })
-    test('true', async () => {
-      const sq = sqorn({
-        pg,
-        pool: new pg.Pool(appConnection),
-        thenable: true
-      })
-      try {
-        expect(await sq`person`({ firstName: 'Jo' })`last_name`).toEqual([
-          { lastName: 'Schmo' }
-        ])
-      } finally {
-        await sq.end()
-      }
-    })
-    test('false', async () => {
-      const sq = sqorn({
-        pg,
-        pool: new pg.Pool(appConnection),
-        thenable: false
-      })
-      try {
-        const query = sq`person`({ firstName: 'Jo' })`last_name`
-        expect(query.then).toBe(undefined)
-        expect(await query).toBe(query)
-      } finally {
-        await sq.end()
-      }
-    })
+    try {
+      expect(
+        await sq.from`person`.where({ firstName: 'Jo' }).return`last_name`.one()
+      ).toEqual({ lastName: 'Schmo' })
+    } finally {
+      await sq.end()
+    }
   })
+  test('false', async () => {
+    const sq = sqorn({
+      pg,
+      pool: new pg.Pool(appConnection)
+    })
+    try {
+      const query = sq.from`person`({ firstName: 'Jo' })`last_name`
+      expect(query.then).toBe(undefined)
+      expect(await query).toBe(query)
+    } finally {
+      await sq.end()
+    }
+  })
+
   describe('mapInputKeys', () => {
     test('default snake_case 1', async () => {
       const sq = sqorn({ pg, pool: new pg.Pool(appConnection) })
@@ -153,7 +140,9 @@ where (ST = $5) and (U_V = $6)`)
       const sq = sqorn({ pg, pool: new pg.Pool(appConnection) })
       try {
         expect(
-          await sq`person`({ firstName: 'Jo' })`id, first_name, last_name`.one()
+          await sq.from`person`.where({
+            firstName: 'Jo'
+          }).return`id, first_name, last_name`.one()
         ).toEqual({ id: 1, firstName: 'Jo', lastName: 'Schmo' })
       } finally {
         await sq.end()
@@ -163,7 +152,7 @@ where (ST = $5) and (U_V = $6)`)
       const sq = sqorn({ pg, pool: new pg.Pool(appConnection) })
       try {
         expect(
-          await sq.from`person`.where({ id: 999 }).return`first_name`
+          await sq.from`person`.where({ id: 999 }).return`first_name`.all()
         ).toEqual([])
       } finally {
         await sq.end()
@@ -172,7 +161,7 @@ where (ST = $5) and (U_V = $6)`)
     test('two rows camelCase', async () => {
       const sq = sqorn({ pg, pool: new pg.Pool(appConnection) })
       try {
-        expect(await sq.from`person`.return`first_name`).toEqual([
+        expect(await sq.from`person`.return`first_name`.all()).toEqual([
           { firstName: 'Jo' },
           { firstName: 'Bo' }
         ])
@@ -188,7 +177,9 @@ where (ST = $5) and (U_V = $6)`)
       })
       try {
         expect(
-          await sq`person`({ firstName: 'Jo' })`id, first_name, last_name`.one()
+          await sq.from`person`.where({
+            firstName: 'Jo'
+          }).return`id, first_name, last_name`.one()
         ).toEqual({ id: 1, first_name: 'Jo', last_name: 'Schmo' })
       } finally {
         await sq.end()
@@ -202,7 +193,9 @@ where (ST = $5) and (U_V = $6)`)
       })
       try {
         expect(
-          await sq`person`({ firstName: 'Jo' })`id, first_name, last_name`.one()
+          await sq.from`person`.where({
+            firstName: 'Jo'
+          }).return`id, first_name, last_name`.one()
         ).toEqual({ ID: 1, FIRST_NAME: 'Jo', LAST_NAME: 'Schmo' })
       } finally {
         await sq.end()

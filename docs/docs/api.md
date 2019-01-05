@@ -6,4 +6,3 @@ sidebar_label: API
 
 TODO
 
-**Refer to the tutorial.**

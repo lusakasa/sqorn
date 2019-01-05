@@ -1,0 +1,30 @@
+{
+  "name": "@sqorn/database",
+  "version": "0.0.45",
+  "description": "Sqorn Database",
+  "author": "Sufyan Dawoodjee <eejdoowad@gmail.com>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "main": "./src/index.js",
+  "repository": "https://github.com/sqorn/sqorn/tree/master/packages/sqorn-database",
+  "homepage": "https://sqorn.org",
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "javascript",
+    "sql",
+    "query",
+    "builder",
+    "template",
+    "strings",
+    "tagged",
+    "template",
+    "literals"
+  ],
+  "dependencies": {
+    "@sqorn/lib-util": "^0.0.45"
+  }
+}

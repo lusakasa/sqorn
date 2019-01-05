@@ -1,5 +1,7 @@
 const { camelCase, memoize } = require('@sqorn/lib-util')
 const createNewContext = require('./context')
+const build = Symbol.for('sqorn-build')
+
 const createQueryBuilder = ({ defaultContext, query, adapter, e, config }) => {
   const { escape } = defaultContext
   const { queries, methods, properties } = query
@@ -68,17 +70,16 @@ const applyReducers = reducers => (method, ctx) => {
     methods.push(method)
   }
   // build methods object by processing methods in call order
-  const express = { id: 0 }
   for (let i = methods.length - 1; i >= 0; --i) {
     const method = methods[i]
-    reducers[method.name](ctx, method.args, express)
+    reducers[method.name](ctx, method.args)
   }
   return ctx
 }
 
 /** Default properties of all SQL Query Builders */
 const builderProperties = ({ chain, newContext, updateContext, queries }) => ({
-  _build: {
+  [build]: {
     value: function(inheritedContext) {
       const ctx = updateContext(this.method, newContext(inheritedContext))
       return queries[ctx.type](ctx)
@@ -86,12 +87,12 @@ const builderProperties = ({ chain, newContext, updateContext, queries }) => ({
   },
   query: {
     get: function() {
-      return this._build()
+      return this[build]()
     }
   },
   unparameterized: {
     get: function() {
-      return this._build({ unparameterized: true }).text
+      return this[build]({ unparameterized: true }).text
     }
   },
   extend: {
@@ -103,7 +104,7 @@ const builderProperties = ({ chain, newContext, updateContext, queries }) => ({
 
 const adapterProperties = ({
   client,
-  config: { thenable = true, mapOutputKeys = camelCase }
+  config: { mapOutputKeys = camelCase }
 }) => {
   const mapKey = memoize(mapOutputKeys)
   return {
@@ -112,32 +113,35 @@ const adapterProperties = ({
         return client.end()
       }
     },
-    one: {
-      value: async function(trx) {
-        const rows = await client.query(this.query, trx)
-        return mapRowKeys(rows, mapKey)[0]
-      }
-    },
     all: {
       value: async function(trx) {
         const rows = await client.query(this.query, trx)
         return mapRowKeys(rows, mapKey)
       }
     },
+    first: {
+      value: async function(trx) {
+        const rows = await client.query(this.query, trx)
+        return mapRowKeys(rows, mapKey)[0]
+      }
+    },
+    one: {
+      value: async function(trx) {
+        const rows = await client.query(this.query, trx)
+        if (rows.length === 0) throw Error('Error: 0 result rows')
+        return mapRowKeys(rows, mapKey)[0]
+      }
+    },
+    run: {
+      value: async function(trx) {
+        await client.query(this.query, trx)
+      }
+    },
     transaction: {
       value: function(fn) {
         return fn ? client.transactionCallback(fn) : client.transactionObject()
       }
-    },
-    ...(thenable
-      ? {
-          then: {
-            value: function(resolve) {
-              resolve(this.all())
-            }
-          }
-        }
-      : {})
+    }
   }
 }
 

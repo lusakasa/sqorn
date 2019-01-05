@@ -107,15 +107,4 @@ describe('extend', () => {
       args: [2000, 'fantasy', 'history']
     })
   })
-  describe('express', () => {
-    query({
-      name: 'frm',
-      query: sq`book`({ genre: 'fantasy' }).extend(
-        sq`author`({ name: 'Jordan' })
-      ).where`book.author_id = author.id``title`,
-      text:
-        'select title from book, author where (genre = $1) and (name = $2) and (book.author_id = author.id)',
-      args: ['fantasy', 'Jordan']
-    })
-  })
 })

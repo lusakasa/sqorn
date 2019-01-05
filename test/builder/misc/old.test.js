@@ -87,34 +87,6 @@ describe('update query - tagged template', () => {
   })
 })
 
-describe('express query - tagged template', () => {
-  query({
-    name: 'select - `frm`',
-    query: sq`person`,
-    text: 'select * from person'
-  })
-  query({
-    name: 'select - `frm``whr`',
-    query: sq`person``age > 7`,
-    text: 'select * from person where (age > 7)'
-  })
-  query({
-    name: 'select - `frm``whr``ret`',
-    query: sq`person``age > 7``age`,
-    text: 'select age from person where (age > 7)'
-  })
-  query({
-    name: 'select - `frm`.where',
-    query: sq`person`.where`age > 7`,
-    text: 'select * from person where (age > 7)'
-  })
-  query({
-    name: 'select - `frm``whr`.return',
-    query: sq`person``age > 7`.return`age`,
-    text: 'select age from person where (age > 7)'
-  })
-})
-
 describe('select query - tagged template args', () => {
   query({
     name: 'select - .from``.where`${int}`',
@@ -159,8 +131,8 @@ describe('sql query - tagged template args', () => {
 
 describe('query - tagged template sql arg', () => {
   query({
-    name: 'select - .sql`${sq``}`',
-    query: sq`${sq`person``age > 7`}`.return`name`,
+    name: 'template tag arg',
+    query: sq.from`${sq.from`person`.where`age > 7`}`.return`name`,
     text: 'select name from (select * from person where (age > 7))',
     args: []
   })

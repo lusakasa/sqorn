@@ -15,7 +15,7 @@ describe('delete', () => {
   })
   query({
     name: 'idempotent',
-    query: sq`book`.delete.delete.delete,
+    query: sq.from`book`.delete.delete.delete,
     text: 'delete from book',
     args: []
   })

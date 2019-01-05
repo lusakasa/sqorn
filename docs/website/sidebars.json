@@ -17,7 +17,7 @@
       "operations"
     ],
     "Execution": [
-      "executing-queries",
+      "execution",
       "transactions"
     ],
     "Misc": [

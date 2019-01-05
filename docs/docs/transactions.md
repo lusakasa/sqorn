@@ -21,7 +21,7 @@ Call `.transaction` with an asynchronous callback to begin a transaction. The fi
 const createAccount = (email, password) => 
   sq.transaction(async trx => {
     const { id } = await sq.sql`insert into account(email) values (${email}) returning id`.one(trx) 
-    await sq`insert into authentication(account_id, password) values (${id}, ${password})`.all(trx)
+    await sq.from`insert into authentication(account_id, password) values (${id}, ${password})`.all(trx)
     return id
   })
 ```
@@ -38,7 +38,7 @@ const createAccount = async (email, password) =>  {
   const trx = await sq.transaction()
   try {
     const { id } = await sq.sql`insert into account(email) values (${email}) returning id`.one(trx) 
-    await sq`insert into authorization(account_id, password) values (${id}, ${password})`.all(trx)
+    await sq.from`insert into authorization(account_id, password) values (${id}, ${password})`.all(trx)
     await trx.commit()
     return id
   } catch (error) {

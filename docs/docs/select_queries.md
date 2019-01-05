@@ -510,29 +510,6 @@ sq.from('generate_series(0, 10) n')
   args: [] }
 ```
 
-## Express
-
-The first, second and third calls of `sq` are equivalent to calling `.from`, `.where` and `.return` respectively.
-
-The following are three sets of equivalent queries:
-
-```js
-// select * from person
-sq`person`
-sq('person')
-sq.from`person`
-
-// select * from person where (name = $1)
-sq`person``name = ${'Jo'}`
-sq`person`({ name: 'Jo' })
-sq.from`person`.where`name = ${'Jo'}`
-
-// select age from person where (name = $1)
-sq`person``name = ${'Jo'}``age`
-sq.from`person`.where`name = ${'Jo'}`.return`age`
-sq.from('person').where({ name: 'Jo' }).return('age')
-```
-
 ## Extend
 
 Construct new queries by extending existing queries with `.extend`.
@@ -554,18 +531,6 @@ sq.from('book').extend(sq.where({ genre: 'fantasy' })).return('title').query
 
 { text: 'select title from book where (genre = $1)',
   args: ['fantasy'] }
-```
-
-Every query chain has its own [Express](#express) state.
-
-```js
-sq`author`.extend(
-  sq`book``book.author_id = author.id``title`,
-  sq`publisher``publisher.id = book.publisher_id``publisher`
-)`author.id = 7``first_name`.query
-
-{ text: 'select title, publisher, first_name from author, book, publisher where (book.author_id = author.id) and (publisher.id = book.publisher_id) and (author.id = 7)',
-  args: [] }
 ```
 
 ## Group By
@@ -784,7 +749,7 @@ sq.from('book').orderBy(sq.return`sales / ${1000}`, 'title').query
 
 `.orderBy` accepts objects.
 
-Property `by` is used for ordering. It can be a string, [Expression](expressions), [Fragment](manual-queries#fragments) or [Subqueries](manual-queries#subqueries).
+Property `by` is used for ordering. It can be a string, [Expression](expressions), [Fragment](manual-queries#fragments) or [Subquery](manual-queries#subqueries).
 
 ```js
 sq.from('book').orderBy({ by: e`sales`.div(1000) }, { by: 'title' }).query
@@ -1064,6 +1029,8 @@ Person.except(Young).intersect(Person.except(Old)).query
 ```
 
 ## With
+
+**Reference** [Postgres](https://www.postgresql.org/docs/current/queries-with.html) [MySQL](https://dev.mysql.com/doc/refman/en/with.html) [SQLite](https://www.sqlite.org/lang_with.html) [T-SQL](https://docs.microsoft.com/en-us/sql/t-sql/queries/with-common-table-expression-transact-sql)
 
 Construct CTEs (Common Table Expressions) with `.with`.
 

@@ -18,7 +18,7 @@ sidebar_label: Update
 
 ## Set
 
-`.from` specifies the table to modify and `.set` specifies the fields to update. [`.from`](#from) works it does in [Delete](delete-queries#from) queries.
+`.from` specifies the table to modify and `.set` specifies the fields to update. [`.from`](#from) works it as does in [Delete](delete-queries#from) queries.
 
 ```js
 sq.from`person`
@@ -91,6 +91,15 @@ sq.from('person')
   args: [] }
 ```
 
+`undefined` values set fields to `default`.
+
+```js
+sq.from('person').set({ firstName: undefined }).query
+
+{ text: "update person set first_name = default",
+  args: [] }
+```
+
 ## Where
 
 Filter the rows to update with `.where`.
@@ -105,7 +114,7 @@ sq.from`person`
   args: ['Robert', 'Rob', 'Matt'] }
 ```
 
-`.where` works it does in [Select](select-queries) queries.
+`.where` works as it does in [Select](select-queries) queries.
 
 ## From
 
@@ -135,15 +144,4 @@ sq.from`person`
 
 { text: 'update person set old = true where (age > 60 and old = false) returning id, age',
   args: [] }
-```
-
-## Express
-
-[Express](select-queries#express) syntax works.
-
-```js
-sq`person`({ firstName: 'Rob' })`id`.set({ firstName: 'Robert'}).query
-
-{ text: 'update person set first_name = $1 where first_name = $2 returning id',
-  args: ['Robert', 'Rob'] }
 ```

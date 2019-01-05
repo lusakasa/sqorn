@@ -13,9 +13,6 @@ new Benchmark.Suite()
   .add('Sqorn - template string', function() {
     sq.from`books`.where`author = ${'Joe'}`.return`title, author, year`.query
   })
-  .add('Sqorn - express', function() {
-    sq`books``author = ${'Joe'}``title, author, year`.query
-  })
   .add('Sqorn - extend', function() {
     sq.extend(
       sq.from`books`,
